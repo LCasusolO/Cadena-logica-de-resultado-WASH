@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadena Lógica de Resultados WASH</title>
+    <style>
+        /* --- FUENTE Y ESTILOS BASE --- */
+        :root {
+            /* --- PALETA DE COLORES REFINADA --- */
+            
+            /* Paleta Verde */
+            --color-green-primary: #3AB14B;
+            --color-green-light: #EFF8EF;
+            --color-green-dark: #2A8C39;
+            --color-focus-green: #196727;
+            --color-focus-green-light: #e0f2e3;
+
+            /* Paleta Celeste */
+            --color-blue-primary: #00B0F0;
+            --color-blue-light: #E0F5FF;
+            --color-blue-dark: #008BC0;
+            --color-focus-blue: #005C8C;
+            --color-focus-blue-light: #C0E9FF;
+            
+            /* Paleta General */
+            --color-primary-dark: #00539B; /* Azul Marino */
+            --color-accent: #F7931E;       /* Naranja */
+            --color-light-bg: #EAF4FC;
+            --color-accent-light-bg: #FFF3E6;
+            
+            /* Paleta Temática */
+            --color-water-theme: #00B0F0;      /* Celeste (Agua) */
+            --color-sanitation-theme: #3AB14B; /* Verde (Saneamiento) */
+
+            /* --- MAPEO DE PALETA PARA ESTE DOCUMENTO --- */
+            /* Aquí asignamos las nuevas variables a las variables que usa el CSS actual */
+            --col-1: var(--color-accent);           /* Naranja */
+            --col-2: var(--color-sanitation-theme); /* Verde (Output) */
+            --col-3: var(--color-water-theme);      /* Celeste (Outcome) */
+            --col-4: var(--color-primary-dark);     /* Azul Marino (Impact) */
+
+            /* --- Variables de UI Base (Conservadas) --- */
+            --text-light: #ffffff;
+            --bg-body: #f4f7f9;
+            --card-bg: #ffffff;
+            --arrow-color: #cccccc;
+            --text-color: #333;
+        }
+
+        /* --- NUEVO: Estilos de Header --- */
+        .main-header {
+            width: 100%;
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            border-bottom: 2px solid #e0e5e9;
+            padding: 1rem 0;
+            box-sizing: border-box;
+        }
+        
+        .header-content {
+            width: 100%;
+            max-width: 1400px;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        
+        .header-logo {
+            height: 80px;
+            width: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        /* --- Fin Estilos de Header --- */
+        
+        /* --- Título principal --- */
+        .main-title {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-primary-dark);
+            margin: 0;
+            line-height: 1.2;
+            text-align: center;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            min-height: 100vh;
+            color: var(--text-color);
+            box-sizing: border-box; 
+        }
+
+        /* --- CONTENEDOR PRINCIPAL (Mobile First) --- */
+        .logic-chain-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        /* --- TARJETAS (ITEMS) --- */
+        .chain-item {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .chain-item:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            transform: translateY(-3px);
+        }
+
+        /* Flechas Conectoras (Mobile: Abajo) */
+        .chain-item::after {
+            content: '▼';
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--arrow-color);
+            font-size: 24px;
+            z-index: 0;
+            opacity: 0.7;
+        }
+
+        .chain-item:last-child::after { display: none; }
+        .chain-item:not(:last-child) { margin-bottom: 25px; }
+
+        /* --- CABECERA (TÍTULO CLICABLE) --- */
+        .item-header {
+            padding: 20px 25px;
+            cursor: pointer;
+            color: var(--text-light);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.25rem;
+            user-select: none;
+            border-top-left-radius: 12px; 
+            border-top-right-radius: 12px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-icon {
+            font-size: 1.8rem;
+            font-weight: 300;
+            transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        /* Colores Específicos por Columna */
+        .item-1 .item-header { background-color: var(--col-1); }
+        .item-2 .item-header { background-color: var(--col-2); }
+        .item-3 .item-header { background-color: var(--col-3); }
+        .item-4 .item-header { background-color: var(--col-4); }
+
+        /* --- CONTENEDOR DE RESUMEN (SIEMPRE VISIBLE) --- */
+        .item-summary {
+            background-color: var(--card-bg);
+            padding: 20px 25px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            transition: border-radius 0.3s ease;
+        }
+
+        .chain-item.active .item-summary {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .item-summary .indicator-item {
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+
+        /* --- CONTENIDO (ACORDEÓN) --- */
+        .item-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.17, 0.84, 0.44, 1), padding 0.5s ease;
+            background-color: var(--card-bg);
+            padding: 0 25px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .content-inner {
+            padding-bottom: 25px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        /* --- NUEVO: ESTILO PARA LOS LINKS --- */
+        .link-styled {
+            color: inherit; /* Hereda el color del texto padre (negro/gris/etc) */
+            text-decoration: none; /* Sin subrayado por defecto */
+            border-bottom: 1px dotted currentColor; /* Subrayado sutil */
+            transition: all 0.2s ease;
+        }
+        .link-styled:hover {
+            opacity: 0.7; /* Efecto al pasar el mouse */
+            border-bottom: 1px solid currentColor; /* Subrayado sólido al hover */
+            cursor: pointer;
+        }
+        /* Reset para links dentro de disease-tags para que no rompan el estilo de la etiqueta */
+        .disease-tag .link-styled {
+            border-bottom: none;
+        }
+        .disease-tag .link-styled:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+
+        /* --- Estilos para Tarjetas de Indicador (Cols 2 & 3) --- */
+        .indicator-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .indicator-item {
+            background: var(--bg-body);
+            border-radius: 8px;
+            padding: 15px 20px;
+            border-left: 4px solid;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .indicator-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .indicator-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+        .indicator-desc {
+            font-size: 0.95rem;
+            margin: 0;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        /* Colorear bordes de indicadores */
+        .item-1 .indicator-item { border-left-color: var(--col-1); }
+        .item-2 .indicator-item { border-left-color: var(--col-2); }
+        .item-3 .indicator-item { border-left-color: var(--col-3); }
+        .item-4 .indicator-item { border-left-color: var(--col-4); }
+
+        /* --- Estilo para listas DENTRO de tarjetas de indicador (Col 1) --- */
+        .indicator-list-content {
+            padding-left: 20px;
+            margin: 10px 0 0 0;
+            list-style-type: disc;
+        }
+        .indicator-list-content li {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #555;
+            padding-left: 0;
+        }
+        .item-1 .indicator-list-content li::marker { color: var(--col-1); }
+
+
+        /* --- ESTADO ACTIVO (EXPANDIDO) --- */
+        .chain-item.active .item-content {
+            max-height: 1500px;
+            transition: max-height 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .chain-item.active .toggle-icon {
+            transform: rotate(135deg);
+        }
+
+        /* --- RESPONSIVE (DESKTOP) --- */
+        @media (min-width: 1024px) {
+            .logic-chain-container {
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 40px;
+            }
+            .chain-item { margin-bottom: 0; }
+            .chain-item:not(:last-child) { margin-bottom: 0; }
+            .chain-item::after {
+                content: '▶';
+                font-size: 30px;
+                top: 22px;
+                right: -32px;
+                left: auto;
+                bottom: auto;
+                transform: none;
+                opacity: 0.5;
+            }
+        }
+
+        /* --- Header Responsive (Móvil) --- */
+        @media (max-width: 768px) {
+            .header-content {
+                 padding: 0 1.5rem;
+                 justify-content: center;
+            }
+            .header-logo { height: 50px; }
+            .main-title { font-size: 1.75rem; }
+            body { padding: 1.5rem; gap: 1.5rem; }
+            .header-content { padding: 0 1.5rem; }
+        }
+        
+        /* Grid para la lista de enfermedades */
+        .disease-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* --- Estilo para Etiquetas de Enfermedad (Col 4) --- */
+        .disease-tag {
+            background-color: #f0f3f5;
+            color: #555;
+            border: 1px solid #e0e5e9;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: default;
+            display: inline-flex; /* Para que el link funcione bien dentro */
+        }
+        .disease-tag:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .item-summary .indicator-item { font-weight: 500; }
+
+    </style>
+</head>
+<body>
+
+<!-- --- Header --- -->
+<header class="main-header">
+    <div class="header-content">
+        <img src="C:/Users/luisc/OneDrive/Documentos/OPS/CADENA LOGICA RESULTADOS/logo-es.png" alt="Logo OPS" class="header-logo">
+        <!-- RECUERDA: Cambia el SRC por tu ruta local -->
+    </div>
+</header>
+
+<h1 class="main-title">Cadena Lógica de Resultados WASH</h1>
+
+<div class="logic-chain-container">
+
+    <!-- COLUMNA 1: Productos y Servicios -->
+    <div class="chain-item item-1">
+        <div class="item-header" data-js-toggle>
+            <span>Productos y Servicios</span>
+            <span class="toggle-icon">+</span>
+        </div>
+        <!-- Resumen Siempre Visible -->
+        <div class="item-summary">
+            <div class="indicator-item">
+                Water and sanitation quality guides OCM 18.c, OCM 18.d, Water and Sanitation Safety Plans OPT 18.2.a
+            </div>
+        </div>
+        <!-- Contenido Plegable -->
+        <div class="item-content">
+            <div class="content-inner">
+                <div class="indicator-list">
+                    <div class="indicator-item">
+                        <span class="indicator-title">Cursos y Herramientas</span>
+                        <ul class="indicator-list-content">
+                            <li>
+                                <!-- Links actualizados desde el archivo -->
+                                <a href="https://campus.paho.org/es/curso/planes-seguridad-agua-resilientes-al-clima" target="_blank" class="link-styled">WSP-RC</a> 
+                                / 
+                                <a href="https://campus.paho.org/es/curso/PlanesSeguridad_SaneamientoClima-RC" target="_blank" class="link-styled">SSP-RC</a>
+                            </li>
+                            <li>
+                                <a href="https://campus.paho.org/es/curso/agua-saneamiento-higiene_establecimientos-salud-WASHFIT" target="_blank" class="link-styled">WASHFIT</a> 
+                                - 
+                                <a href="https://campus.paho.org/es/curso/agua_emergencias_establecimientos_salud" target="_blank" class="link-styled">WASHPRESS</a>
+                            </li>
+                            <li>
+                                <a href="https://campus.paho.org/es/curso/agua_emergencias_establecimientos_salud" target="_blank" class="link-styled">Environmental cleaning and disinfection of health care facilities</a>
+                            </li>
+                            <li>
+                                <a href="https://campus.paho.org/es/curso/agua-saneamiento-higiene-indicadores-ODS" target="_blank" class="link-styled">SDG Methodology 6.1, 6.2 and 6.3.1</a>
+                            </li>
+                            <li>
+                                <!-- Este link no apareció en el reporte, se puede dejar pendiente -->
+                                <a href="#" class="link-styled">Agua, Saneamiento, Higiene y Salud: Trabajando juntos</a>
+                            </li>
+                            <li>
+                                <a href="https://campus.paho.org/es/curso/agua-saneamiento-higiene-indicadores-ODS" target="_blank" class="link-styled">GLAAS</a>
+                            </li>
+                            <li>
+                                <a href="https://www.who.int/teams/environment-climate-change-and-health/water-sanitation-and-health/monitoring-and-evidence/wash-systems-monitoring/un-water-global-analysis-and-assessment-of-sanitation-and-drinking-water/wash-accounts" target="_blank" class="link-styled">WASH financial accounts - TrackFin</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-title">Publicaciones y Estudios</span>
+                        <ul class="indicator-list-content">
+                            <li>
+                                <a href="https://iris.paho.org/bitstream/handle/10665.2/55708/9789275324653_spa.pdf?sequence=1&isAllowed=y" target="_blank" class="link-styled">WASH en HCF (7 Países)</a>
+                            </li>
+                            <!-- Estos links estaban en el medio del archivo y no fueron visibles. Pegar aquí si los tienes. -->
+                            <li><a href="https://iris.paho.org/handle/10665.2/55724" class="link-styled">Protocolo evaluación HCF</a></li>
+                            <li><a href="https://campus.paho.org/es/curso/planes-seguridad-agua-resilientes-al-clima" class="link-styled">Monitoreo de patógenos en aguas residuales</a></li>
+                            <li><a href="https://paho.sharepoint.com/:b:/r/sites/DHE/DHECE/Hilde V/DOCUMENTOS ETRAS/Informe GLAAS ALC.pdf?csf=1&web=1&e=6uRodU" class="link-styled">Resultados del GLAAS Regional</a> y 
+                                <a href="https://paho.sharepoint.com/:p:/s/DHE/EZ0Ur8806rVNsLAoNwbPHnkBJaGWpWKhz87EvbcDOUojFw?e=HkMkxw" class="link-styled"> TrackFin en ALC</a> </li>
+                            <li><a href="https://paho.sharepoint.com/:w:/s/DHE/EQBYXOt8_LtJhah9ypccHsoBZ5Yg_fyqk-RCrA9kRAmgrw?e=raeE65" class="link-styled">Tecnologías CCPP 3000</a></li>
+                            <li><a href="https://paho.sharepoint.com/:b:/s/DHE/Ee5r--fPpfNOsA8FU2MuydEBewVrFWJieu3w7vsrk8L-Lg?e=2I4suX" class="link-styled">Material educativo E. desat.</a></li>
+                            <li><a href="https://campus.paho.org/es/curso/planes-de-seguridad-del-agua-resilientes-al-clima-2021" class="link-styled">Informe WASH, salud e inequidades</a></li>
+                        </ul>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-title">Human resources and financing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COLUMNA 2: Output Indicator -->
+    <div class="chain-item item-2">
+        <div class="item-header" data-js-toggle>
+            <span>Output Indicator</span>
+            <span class="toggle-icon">+</span>
+        </div>
+        <div class="item-summary">
+            <div class="indicator-item">
+                <a href="https://app.powerbi.com/view?r=eyJrIjoiZDY1NTY3N2UtNTAwYS00MGJmLWI2YjUtZWNlNTI3Nzk2YmE2IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" target="_blank" class="link-styled">
+                    Number of countries and territories implementing Water and Sanitation Safety Plans, policies, programs and/or interventions...
+                </a>
+            </div>
+        </div>
+        <div class="item-content">
+            <div class="content-inner">
+                <div class="indicator-list">
+                    <div class="indicator-item">
+                        <span class="indicator-title">Parte del OPT 18.2.a</span>
+                        <p class="indicator-desc"> 
+                            <a href="https://www.who.int/data/gho/data/indicators/indicator-details/GHO/population-practising-open-defecation-(-)" class="link-styled">
+                                Nº de personas entrenadas en PSA-RC y PSS-RC.
+                            </a>
+                        </p>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-title">WASH Expenditures</span>
+                        <p class="indicator-desc">
+                             <a href="https://www.who.int/data/gho/data/indicators/indicator-details/GHO/population-practising-open-defecation-(-)" class="link-styled">
+                                Nº of countries with total WASH expenditures as a percentage of GDP of 2% and disaggregated TrackFin indicators.
+                             </a>
+                        </p>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-title">Surveillance Capacity</span>
+                        <p class="indicator-desc">
+                            <a href="https://www.who.int/data/gho/data/indicators/indicator-details/GHO/population-practising-open-defecation-(-)" class="link-styled">
+                                Nº of countries with laboratories and surveillance capacity.
+                            </a>
+                        </p>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-title">Emergency Response</span>
+                        <p class="indicator-desc">
+                            <a href="https://www.who.int/data/gho/data/indicators/indicator-details/GHO/population-practising-open-defecation-(-)" class="link-styled">
+                                No. of countries with emergency response capacity.
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COLUMNA 3: Outcome Indicator -->
+    <div class="chain-item item-3">
+        <div class="item-header" data-js-toggle>
+            <span>Outcome Indicator</span>
+            <span class="toggle-icon">+</span>
+        </div>
+        <div class="item-summary">
+            <div class="indicator-item">
+                <a href="https://app.powerbi.com/view?r=eyJrIjoiNjlkZTliNTQtYWVhNC00ZjYwLWI4OTctMDlmMDMwZGJhMTNjIiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">
+                    SDG 6.1.1. Proportion of population using safely managed drinking-water services (access, continuity and quality of water) (%)
+                </a>
+            </div>
+        </div>
+        <div class="item-content">
+            <div class="content-inner">
+                <div class="indicator-list">
+                    <div class="indicator-item">
+                        <span class="indicator-title">OCM 18.c</span>
+                        <p class="indicator-desc">
+                            <a href="https://app.powerbi.com/view?r=eyJrIjoiOTQyNjhhMzItYmU3ZC00NDMxLWIzODItZTgzNGFmMjg0YzkxIiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">
+                                SDG 6.2.1 Proportion of Population using safely managed sanitation services (access and effective wastewater treatment) (%)
+                            </a>
+                        </p>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-title">OCM 18.d</span>
+                        <p class="indicator-desc">
+                            <a href="https://app.powerbi.com/view?r=eyJrIjoiZDgyZGJjNTUtNjgwMi00M2QxLTk5OTAtZjdkZTBlOWZmYjRjIiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">
+                                Population with basic handwashing facilities at home (%)
+                            </a>
+                        </p>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-title">Parte del OCM 18.d</span>
+                        <p class="indicator-desc">
+                            <a href="https://app.powerbi.com/view?r=eyJrIjoiYTY4ZmIzZjctM2JjZC00ODdmLWE1NmMtOTdlYWJlZjYxMWZmIiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">
+                                SDG 6.3.1 Proportion of safely treated domestic wastewater flows (%)
+                            </a>
+                        </p>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-title">Parte del OCM 18.d</span>
+                        <p class="indicator-desc">
+                            <!-- Link actualizado desde el archivo -->
+                            <a href="https://app.powerbi.com/view?r=eyJrIjoiNzRjMjRkODktOWY2Yi00ZjEzLThjMjEtM2ViMWMyODM0MmM5IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" target="_blank" class="link-styled">
+                                Proporción de Establecimientos de Salud con servicios WASH (%)
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COLUMNA 4: Impact Indicator -->
+    <div class="chain-item item-4">
+        <div class="item-header" data-js-toggle>
+            <span>Impact Indicator</span>
+            <span class="toggle-icon">+</span>
+        </div>
+        <div class="item-summary">
+            <div class="indicator-item">
+                <!-- Link actualizado desde el archivo -->
+                <a href="https://app.powerbi.com/view?r=eyJrIjoiZTAzYmY5MzktNDhlNC00OTUxLTgzYTMtMmZmMDZlNDgwZjRhIiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" target="_blank" class="link-styled">
+                    Tasa de mortalidad atribuida a la exposición a servicios de agua, saneamiento e higiene inseguros (por 100,000 habitantes).
+                </a>
+            </div>
+        </div>
+        <div class="item-content">
+            <div class="content-inner">
+                <div class="indicator-list">
+                    <div class="indicator-item">
+                        <span class="indicator-title">Enfermedades Asociadas a WASH</span>
+                        <div class="disease-list">
+                            <!-- Chagas actualizado desde el archivo -->
+                            <span class="disease-tag">
+                                <a href="https://app.powerbi.com/view?r=eyJrIjoiYmM3N2NkZWUtY2M5NC00YTNjLWJmMzctMTJiZjBmMGQxMGY0IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" target="_blank" class="link-styled">Chagas</a>
+                            </span>
+                            
+                            <!-- Los links de estas enfermedades estaban en el medio del archivo. He dejado el placeholder. -->
+                            <span class="disease-tag"><a href="https://app.powerbi.com/view?r=eyJrIjoiYmM3N2NkZWUtY2M5NC00YTNjLWJmMzctMTJiZjBmMGQxMGY0IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">Filariasis linfática</a></span>
+                            <span class="disease-tag"><a href="https://app.powerbi.com/view?r=eyJrIjoiYmM3N2NkZWUtY2M5NC00YTNjLWJmMzctMTJiZjBmMGQxMGY0IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">Oncocercosis</a></span>
+                            <span class="disease-tag"><a href="https://app.powerbi.com/view?r=eyJrIjoiYmM3N2NkZWUtY2M5NC00YTNjLWJmMzctMTJiZjBmMGQxMGY0IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">Esquistosomiasis</a></span>
+                            <span class="disease-tag"><a href="https://app.powerbi.com/view?r=eyJrIjoiYTk4ZmZjMTAtNDllOC00MjQ0LWFmNjItMDRkOTYwY2RjYjFhIiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">Tracoma</a></span>
+                            <span class="disease-tag"><a href="#" class="link-styled">Enfermedades Diarreicas Agudas</a></span>
+                            <span class="disease-tag"><a href="#" class="link-styled">Colera</a></span>
+                            <span class="disease-tag"><a href="#" class="link-styled">Helmintiasis</a></span>
+                            <span class="disease-tag"><a href="#" class="link-styled">Malaria</a></span>
+                            <span class="disease-tag"><a href="#" class="link-styled">Lepra</a></span>
+                            <span class="disease-tag"><a href="#" class="link-styled">Peste</a></span>
+                            <span class="disease-tag"><a href="#" class="link-styled">Leishmaniasis</a></span>
+                            <span class="disease-tag"><a href="#" class="link-styled">Fascioliasis</a></span>
+                            <span class="disease-tag"><a href="#" class="link-styled">Equinococosis</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener('click', function(e) {
+        const header = e.target.closest('[data-js-toggle]');
+        if (!header) return; 
+        const item = header.parentElement; 
+        item.classList.toggle('active');
+        const icon = item.querySelector('.toggle-icon');
+        if (item.classList.contains('active')) {
+            icon.textContent = '+'; 
+            icon.style.transform = 'rotate(135deg)';
+        } else {
+            icon.textContent = '+';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    });
+</script>
+
+</body>
+</html>
