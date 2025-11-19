@@ -50,24 +50,22 @@
 
         /* --- NUEVO: Estilos de Header --- */
         .main-header {
-            width: 100%;
+            width: 100%; /* Ocupa todo el ancho */
             display: flex;
             justify-content: center; 
             align-items: center;
             border-bottom: 2px solid rgba(0, 83, 155, 0.1); 
             padding: 1rem 0;
             box-sizing: border-box;
-            
-            /* --- MODIFICADO: Fondo blanco SÓLIDO --- */
-            /* Antes era semitransparente. Ahora es #ffffff para tapar la imagen de fondo */
+            /* Fondo blanco SÓLIDO para tapar la imagen de fondo en la zona del header */
             background-color: #ffffff; 
-            /* Eliminamos el backdrop-filter ya que el color es sólido */
+            z-index: 10; /* Asegura que esté por encima si fuera necesario */
         }
         
         .header-content {
             width: 100%;
             max-width: 1400px;
-            padding: 0 2rem;
+            padding: 0 2rem; /* Padding interno para alinear con el contenido */
             display: flex;
             align-items: center;
             box-sizing: border-box;
@@ -94,31 +92,35 @@
             max-width: 1400px;
             /* Sombra blanca suave al texto para mejorar legibilidad sobre imagen */
             text-shadow: 0 2px 15px rgba(255, 255, 255, 0.8);
+            padding: 0 1rem; /* Pequeño padding lateral para móviles */
+            box-sizing: border-box;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* Color de respaldo por si la imagen tarda en cargar */
             background-color: var(--bg-body);
             
             /* --- CONFIGURACIÓN DE IMAGEN DE FONDO --- */
-            background-image: url('fondo.jpg'); /* Ruta de tu imagen */
-            background-size: cover;            /* Cubre toda la pantalla */
-            background-position: center;       /* Centra la imagen */
-            background-attachment: fixed;      /* Fija la imagen al hacer scroll */
-            background-repeat: no-repeat;      /* No repetir */
+            background-image: url('fondo.jpg'); 
+            background-size: cover;           
+            background-position: center;       
+            background-attachment: fixed;      
+            background-repeat: no-repeat;     
             /* ----------------------------------------------- */
 
             margin: 0;
-            /* MODIFICADO: Quitamos padding top del body para que el header toque el borde superior */
-            padding: 0 2rem 2rem 2rem; 
+            /* --- CORRECCIÓN --- */
+            padding: 0; /* ELIMINADO el padding general para que el header toque los bordes */
+            /* ------------------ */
+            
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2rem;
+            gap: 2rem; /* Espacio vertical entre elementos */
             min-height: 100vh;
             color: var(--text-color);
-            box-sizing: border-box; 
+            box-sizing: border-box;
+            padding-bottom: 2rem; /* Espacio solo al final de la página */
         }
 
         /* --- CONTENEDOR PRINCIPAL (Mobile First) --- */
@@ -127,7 +129,10 @@
             flex-direction: column;
             gap: 15px;
             max-width: 1400px;
-            width: 100%;
+            
+            /* --- CORRECCIÓN --- */
+            width: calc(100% - 4rem); /* Restamos espacio para los márgenes laterales */
+            /* ------------------ */
         }
 
         /* --- TARJETAS (ITEMS) --- */
@@ -342,8 +347,8 @@
             }
             .header-logo { height: 50px; }
             .main-title { font-size: 1.75rem; }
-            body { padding: 0 1.5rem 1.5rem 1.5rem; gap: 1.5rem; }
-            .header-content { padding: 0 1.5rem; }
+            /* Ajustar width en movil */
+            .logic-chain-container { width: calc(100% - 2rem); } 
         }
         
         /* Grid para la lista de enfermedades */
@@ -417,15 +422,15 @@
                                 <a href="https://campus.paho.org/es/curso/PlanesSeguridad_SaneamientoClima-RC" target="_blank" class="link-styled">SSP-RC</a>
                             </li>
                             <li>
-                                <a href="https://campus.paho.org/es/curso/agua-saneamiento-higiene-indicadores-ODS" target="_blank" class="link-styled">SDG Methodology 6.1, 6.2 and 6.3.1</a>
-                            </li>
-                            <li>
                                 <a href="https://campus.paho.org/es/curso/agua-saneamiento-higiene_establecimientos-salud-WASHFIT" target="_blank" class="link-styled">WASHFIT</a> 
                                 - 
                                 <a href="https://campus.paho.org/es/curso/agua_emergencias_establecimientos_salud" target="_blank" class="link-styled">WASHPRESS</a>
                             </li>
                             <li>
                                 <a href="https://campus.paho.org/es/curso/agua_emergencias_establecimientos_salud" target="_blank" class="link-styled">Environmental cleaning and disinfection of health care facilities</a>
+                            </li>
+                            <li>
+                                <a href="https://campus.paho.org/es/curso/agua-saneamiento-higiene-indicadores-ODS" target="_blank" class="link-styled">SDG Methodology 6.1, 6.2 and 6.3.1</a>
                             </li>
                             <li>
                                 <!-- Este link no apareció en el reporte, se puede dejar pendiente -->
