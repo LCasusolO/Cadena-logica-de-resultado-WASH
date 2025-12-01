@@ -30,7 +30,7 @@
             --color-accent-light-bg: #FFF3E6;
             
             /* Paleta Temática */
-            --color-water-theme: #00B0F0;      /* Celeste (Agua) */
+            --color-water-theme: #00B0F0;       /* Celeste (Agua) */
             --color-sanitation-theme: #3AB14B; /* Verde (Saneamiento) */
 
             /* --- MAPEO DE PALETA PARA ESTE DOCUMENTO --- */
@@ -102,16 +102,14 @@
             
             /* --- CONFIGURACIÓN DE IMAGEN DE FONDO --- */
             background-image: url('fondo.jpg'); 
-            background-size: cover;           
-            background-position: center;       
-            background-attachment: fixed;      
-            background-repeat: no-repeat;     
+            background-size: cover;            
+            background-position: center;        
+            background-attachment: fixed;       
+            background-repeat: no-repeat;       
             /* ----------------------------------------------- */
 
             margin: 0;
-            /* --- CORRECCIÓN --- */
-            padding: 0; /* ELIMINADO el padding general para que el header toque los bordes */
-            /* ------------------ */
+            padding: 0;
             
             display: flex;
             flex-direction: column;
@@ -129,25 +127,22 @@
             flex-direction: column;
             gap: 15px;
             max-width: 1400px;
-            
-            /* --- CORRECCIÓN --- */
             width: calc(100% - 4rem); /* Restamos espacio para los márgenes laterales */
-            /* ------------------ */
         }
 
         /* --- TARJETAS (ITEMS) --- */
         .chain-item {
             flex: 1;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: transparent; /* Fondo transparente para que solo se vea el contenido */
+            /* Quitamos el shadow del contenedor principal para que no se vea una caja vacía */
+            box-shadow: none; 
+            transition: transform 0.3s ease;
             position: relative;
         }
-
-        .chain-item:hover {
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-            transform: translateY(-3px);
+        
+        /* Aplicamos el fondo y la sombra a las partes visibles */
+        .chain-item.active {
+             /* Opcional: Si quieres sombra general al abrirse */
         }
 
         /* Flechas Conectoras (Mobile: Abajo) */
@@ -166,6 +161,11 @@
         .chain-item:last-child::after { display: none; }
         .chain-item:not(:last-child) { margin-bottom: 25px; }
 
+
+        /* -----------------------------------------------------------
+           MODIFICACIÓN PRINCIPAL: HEADER Y CONTENIDO PLEGABLE
+           ----------------------------------------------------------- */
+
         /* --- CABECERA (TÍTULO CLICABLE) --- */
         .item-header {
             padding: 20px 25px;
@@ -177,11 +177,17 @@
             align-items: center;
             font-size: 1.25rem;
             user-select: none;
-            border-top-left-radius: 12px; 
-            border-top-right-radius: 12px;
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-            transition: background-color 0.3s ease;
+            
+            /* ESTADO INICIAL: Bordes totalmente redondeados */
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* Sombra en el header */
+            
+            transition: background-color 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .item-header:hover {
+            opacity: 0.95;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
         }
 
         .toggle-icon {
@@ -196,18 +202,38 @@
         .item-3 .item-header { background-color: var(--col-3); }
         .item-4 .item-header { background-color: var(--col-4); }
 
-        /* --- CONTENEDOR DE RESUMEN (SIEMPRE VISIBLE) --- */
-        .item-summary {
-            background-color: var(--card-bg);
-            padding: 20px 25px;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            transition: border-radius 0.3s ease;
-        }
-
-        .chain-item.active .item-summary {
+        /* --- CUANDO ESTÁ ACTIVO (ABIERTO) --- */
+        .chain-item.active .item-header {
+            /* Quitamos bordes inferiores para unir con el contenido */
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
+        }
+        
+        .chain-item.active .toggle-icon {
+            transform: rotate(135deg);
+        }
+
+        /* --- CONTENEDOR DE RESUMEN (AHORA OCULTO AL INICIO) --- */
+        .item-summary {
+            background-color: var(--card-bg);
+            overflow: hidden;
+            
+            /* ESTADO INICIAL: CERRADO */
+            max-height: 0;
+            padding: 0 25px; 
+            opacity: 0;
+            
+            transition: all 0.5s cubic-bezier(0.17, 0.84, 0.44, 1);
+            
+            /* Sombra lateral para dar continuidad visual */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        /* ESTADO ACTIVO: ABIERTO */
+        .chain-item.active .item-summary {
+            max-height: 800px; /* Altura máxima suficiente */
+            padding: 20px 25px;
+            opacity: 1;
         }
 
         .item-summary .indicator-item {
@@ -215,38 +241,55 @@
             font-weight: 500;
         }
 
-        /* --- CONTENIDO (ACORDEÓN) --- */
+        /* --- CONTENIDO DETALLADO (ACORDEÓN) --- */
         .item-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.17, 0.84, 0.44, 1), padding 0.5s ease;
             background-color: var(--card-bg);
             padding: 0 25px;
+            opacity: 0; /* Agregamos opacidad para transición suave */
+            
+            /* Bordes inferiores siempre redondeados para cerrar la tarjeta */
             border-bottom-left-radius: 12px;
             border-bottom-right-radius: 12px;
+            
+            transition: max-height 0.7s cubic-bezier(0.17, 0.84, 0.44, 1), padding 0.5s ease, opacity 0.5s ease;
+            
+            /* Sombra lateral */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        /* ESTADO ACTIVO: ABIERTO */
+        .chain-item.active .item-content {
+            max-height: 2000px; /* Altura máxima suficiente */
+            opacity: 1;
+            /* El padding se maneja mejor en el .content-inner o dinámicamente, pero aquí mantenemos el lateral */
         }
 
         .content-inner {
             padding-bottom: 25px;
             font-size: 0.95rem;
             line-height: 1.7;
-            border-top: 1px solid #eee;
+            border-top: 1px solid #eee; /* Línea separadora sutil */
             padding-top: 20px;
         }
         
-        /* --- NUEVO: ESTILO PARA LOS LINKS --- */
+        /* -----------------------------------------------------------
+           FIN MODIFICACIONES
+           ----------------------------------------------------------- */
+        
+        /* --- ESTILO PARA LOS LINKS --- */
         .link-styled {
-            color: inherit; /* Hereda el color del texto padre (negro/gris/etc) */
-            text-decoration: none; /* Sin subrayado por defecto */
-            border-bottom: 1px dotted currentColor; /* Subrayado sutil */
+            color: inherit; 
+            text-decoration: none; 
+            border-bottom: 1px dotted currentColor; 
             transition: all 0.2s ease;
         }
         .link-styled:hover {
-            opacity: 0.7; /* Efecto al pasar el mouse */
-            border-bottom: 1px solid currentColor; /* Subrayado sólido al hover */
+            opacity: 0.7; 
+            border-bottom: 1px solid currentColor; 
             cursor: pointer;
         }
-        /* Reset para links dentro de disease-tags para que no rompan el estilo de la etiqueta */
         .disease-tag .link-styled {
             border-bottom: none;
         }
@@ -254,7 +297,6 @@
             opacity: 1;
             text-decoration: underline;
         }
-
 
         /* --- Estilos para Tarjetas de Indicador (Cols 2 & 3) --- */
         .indicator-list {
@@ -308,16 +350,6 @@
         .item-1 .indicator-list-content li::marker { color: var(--col-1); }
 
 
-        /* --- ESTADO ACTIVO (EXPANDIDO) --- */
-        .chain-item.active .item-content {
-            max-height: 1500px;
-            transition: max-height 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        
-        .chain-item.active .toggle-icon {
-            transform: rotate(135deg);
-        }
-
         /* --- RESPONSIVE (DESKTOP) --- */
         @media (min-width: 1024px) {
             .logic-chain-container {
@@ -347,7 +379,6 @@
             }
             .header-logo { height: 50px; }
             .main-title { font-size: 1.75rem; }
-            /* Ajustar width en movil */
             .logic-chain-container { width: calc(100% - 2rem); } 
         }
         
@@ -370,7 +401,7 @@
             font-weight: 500;
             transition: all 0.2s ease;
             cursor: default;
-            display: inline-flex; /* Para que el link funcione bien dentro */
+            display: inline-flex;
         }
         .disease-tag:hover {
             background-color: #e9ecef;
@@ -402,7 +433,7 @@
             <span>Products and Services</span>
             <span class="toggle-icon">+</span>
         </div>
-        <!-- Resumen Siempre Visible -->
+        <!-- Resumen (Ahora oculto inicialmente) -->
         <div class="item-summary">
             <div class="indicator-item">
                 Water and sanitation quality guides OCM 18.c, OCM 18.d, Water and Sanitation Safety Plans OPT 18.2.a
@@ -416,7 +447,6 @@
                         <span class="indicator-title">Cursos y Herramientas</span>
                         <ul class="indicator-list-content">
                             <li>
-                                <!-- Links actualizados desde el archivo -->
                                 <a href="https://campus.paho.org/es/curso/planes-seguridad-agua-resilientes-al-clima" target="_blank" class="link-styled">WSP-RC</a> 
                                 / 
                                 <a href="https://campus.paho.org/es/curso/PlanesSeguridad_SaneamientoClima-RC" target="_blank" class="link-styled">SSP-RC</a>
@@ -433,7 +463,6 @@
                                 <a href="https://campus.paho.org/es/curso/agua-saneamiento-higiene-indicadores-ODS" target="_blank" class="link-styled">SDG Methodology 6.1, 6.2 and 6.3.1</a>
                             </li>
                             <li>
-                                <!-- Este link no apareció en el reporte, se puede dejar pendiente -->
                                 <a href="#" class="link-styled">Agua, Saneamiento, Higiene y Salud: Trabajando juntos</a>
                             </li>
                             <li>
@@ -450,7 +479,6 @@
                             <li>
                                 <a href="https://iris.paho.org/bitstream/handle/10665.2/55708/9789275324653_spa.pdf?sequence=1&isAllowed=y" target="_blank" class="link-styled">WASH en HCF (7 Países)</a>
                             </li>
-                            <!-- Estos links estaban en el medio del archivo y no fueron visibles. Pegar aquí si los tienes. -->
                             <li><a href="https://iris.paho.org/handle/10665.2/55724" class="link-styled">Protocolo evaluación HCF</a></li>
                             <li><a href="https://campus.paho.org/es/curso/planes-seguridad-agua-resilientes-al-clima" class="link-styled">Monitoreo de patógenos en aguas residuales</a></li>
                             <li><a href="https://paho.sharepoint.com/:b:/r/sites/DHE/DHECE/Hilde V/DOCUMENTOS ETRAS/Informe GLAAS ALC.pdf?csf=1&web=1&e=6uRodU" class="link-styled">Resultados del GLAAS Regional</a> y 
@@ -564,7 +592,6 @@
                     <div class="indicator-item">
                         <span class="indicator-title">Parte del OCM 18.d</span>
                         <p class="indicator-desc">
-                            <!-- Link actualizado desde el archivo -->
                             <a href="https://app.powerbi.com/view?r=eyJrIjoiNzRjMjRkODktOWY2Yi00ZjEzLThjMjEtM2ViMWMyODM0MmM5IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" target="_blank" class="link-styled">
                                 Proporción de Establecimientos de Salud con servicios WASH (%)
                             </a>
@@ -583,7 +610,6 @@
         </div>
         <div class="item-summary">
             <div class="indicator-item">
-                <!-- Link actualizado desde el archivo -->
                 <a href="https://app.powerbi.com/view?r=eyJrIjoiZTAzYmY5MzktNDhlNC00OTUxLTgzYTMtMmZmMDZlNDgwZjRhIiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" target="_blank" class="link-styled">
                     Tasa de mortalidad atribuida a la exposición a servicios de agua, saneamiento e higiene inseguros (por 100,000 habitantes).
                 </a>
@@ -595,12 +621,10 @@
                     <div class="indicator-item">
                         <span class="indicator-title">Enfermedades Asociadas a WASH</span>
                         <div class="disease-list">
-                            <!-- Chagas actualizado desde el archivo -->
                             <span class="disease-tag">
                                 <a href="https://app.powerbi.com/view?r=eyJrIjoiYmM3N2NkZWUtY2M5NC00YTNjLWJmMzctMTJiZjBmMGQxMGY0IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" target="_blank" class="link-styled">Chagas</a>
                             </span>
                             
-                            <!-- Los links de estas enfermedades estaban en el medio del archivo. He dejado el placeholder. -->
                             <span class="disease-tag"><a href="https://app.powerbi.com/view?r=eyJrIjoiYmM3N2NkZWUtY2M5NC00YTNjLWJmMzctMTJiZjBmMGQxMGY0IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">Filariasis linfática</a></span>
                             <span class="disease-tag"><a href="https://app.powerbi.com/view?r=eyJrIjoiYmM3N2NkZWUtY2M5NC00YTNjLWJmMzctMTJiZjBmMGQxMGY0IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">Oncocercosis</a></span>
                             <span class="disease-tag"><a href="https://app.powerbi.com/view?r=eyJrIjoiYmM3N2NkZWUtY2M5NC00YTNjLWJmMzctMTJiZjBmMGQxMGY0IiwidCI6Ijk4MjAxZmVmLWQ5ZjYtNGU2OC04NGY1LWMyNzA1MDc0ZTM0MiIsImMiOjR9" class="link-styled">Esquistosomiasis</a></span>
@@ -632,14 +656,12 @@
         const icon = item.querySelector('.toggle-icon');
         if (item.classList.contains('active')) {
             icon.textContent = '+'; 
-            icon.style.transform = 'rotate(135deg)';
+            /* El icono rota gracias al CSS, no necesitas cambiar el texto a '-' si prefieres la animación de giro */
         } else {
             icon.textContent = '+';
-            icon.style.transform = 'rotate(0deg)';
         }
     });
 </script>
 
 </body>
 </html>
-
